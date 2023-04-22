@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card, Button } from "react-bootstrap";
-
+import "./orderform.css";
 function OrderForm({ socket }) {
   const [tableNumber, setTableNumber] = useState("");
   const [orderBy, setOrderBy] = useState("");
@@ -10,6 +10,7 @@ function OrderForm({ socket }) {
     { id: 2, name: "Pizza", price: 15 },
     { id: 3, name: "Salad", price: 8 },
   ]);
+  const [selectedOptions, setSelectedOptions] = useState([]);
 
   const handleTableNumberChange = (event) => {
     setTableNumber(event.target.value);
@@ -28,31 +29,40 @@ function OrderForm({ socket }) {
   //     );
   //   };
 
-  const handleCheck = (event) => {
-    const item = event.target.name;
-    console.log("item==>", item);
-    const isChecked = event.target.checked;
+  // const handleCheck = (event) => {
+  //   const item = event.target.name;
+  //   console.log("item==>", item);
+  //   const isChecked = event.target.checked;
 
-    // setChecked({ ...checked, item: isChecked });
-    var updatedList = [...checked];
-    let order_item = JSON.parse(event.target.value);
-    if (event.target.checked) {
-      updatedList = [...checked, order_item];
-    } else {
-      //   updatedList.slice(checked.indexOf(order_item), 1);
-      setChecked((prevState) =>
-        !isChecked
-          ? [...prevState, item]
-          : prevState.filter((checkedItem) => checkedItem !== item)
+  //   // setChecked({ ...checked, item: isChecked });
+  //   var updatedList = [];
+  //   // var updatedList = [...checked];
+  //   let order_item = JSON.parse(event.target.value);
+  //   if (event.target.checked) {
+  //     updatedList = [...checked, order_item];
+  //   } else {
+  //     //   updatedList.slice(checked.indexOf(order_item), 1);
+  //     // setChecked((prevState) =>
+  //     //   !isChecked
+  //     //     ? [...prevState, item]
+  //     //     : prevState.filter((checkedItem) => checkedItem !== item)
+  //     // );
+  //   }
+  //   setChecked(updatedList);
+  // };
+  const handleCheckboxChange = (selectedObject) => {
+    const selectedOptionIds = selectedOptions.map((option) => option.id);
+    if (selectedOptionIds.includes(selectedObject.id)) {
+      setSelectedOptions(
+        selectedOptions.filter((option) => option.id !== selectedObject.id)
       );
-      //   setChecked(checked.filter((val) => val !== order_item));
+    } else {
+      setSelectedOptions([...selectedOptions, selectedObject]);
     }
-    setChecked(updatedList);
   };
-
   // Return classes based on whether item is checked
-  var isChecked = (item) =>
-    checked.includes(item) ? "checked-item" : "not-checked-item";
+  // var isChecked = (item) =>
+  //   checked.includes(item) ? "checked-item" : "not-checked-item";
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -60,7 +70,7 @@ function OrderForm({ socket }) {
     const order = {
       tableNumber: tableNumber,
       orderBy: orderBy,
-      items: checked,
+      items: selectedOptions,
       status: "Pending",
       timestamp: new Date().toLocaleString(),
     };
@@ -85,24 +95,8 @@ function OrderForm({ socket }) {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        margin: "auto",
-      }}
-    >
-      {console.log("checked====> ", checked)}
-      <Card
-        style={{
-          width: "fit-content",
-          padding: "100px",
-          marginTop: "20px",
-          boxShadow:
-            "rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset ",
-        }}
-      >
+    <div className="main">
+      <Card className="card">
         <h1>Place Order</h1>
         <form onSubmit={handleSubmit}>
           <label for="tableNumber">Table Number:</label> <br />
@@ -132,9 +126,13 @@ function OrderForm({ socket }) {
                   name={index}
                   value={JSON.stringify(item)}
                   type="checkbox"
-                  onChange={(e) => handleCheck(e)}
+                  // onChange={(e) => handleCheck(e, item)}
+                  checked={selectedOptions.some(
+                    (selectedOption) => selectedOption.id === item.id
+                  )}
+                  onChange={() => handleCheckboxChange(item)}
                 />
-                <span className={isChecked(item)}>
+                <span>
                   {item.name} &#8377;{item.price}/-
                 </span>
               </div>
@@ -142,7 +140,7 @@ function OrderForm({ socket }) {
           </div>
           <br />
           <ul>
-            {checked.map((item) => (
+            {selectedOptions.map((item) => (
               <li key={item.id}>
                 {item.name} (&#8377;{item.price})
               </li>
