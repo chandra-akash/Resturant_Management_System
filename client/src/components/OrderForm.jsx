@@ -4,7 +4,6 @@ import "./orderform.css";
 function OrderForm({ socket }) {
   const [tableNumber, setTableNumber] = useState("");
   const [orderBy, setOrderBy] = useState("");
-  const [checked, setChecked] = useState([]);
   const [menuItems] = useState([
     { id: 1, name: "Burger", price: 10 },
     { id: 2, name: "Pizza", price: 15 },
@@ -18,38 +17,6 @@ function OrderForm({ socket }) {
   const handleOrderByChange = (event) => {
     setOrderBy(event.target.value);
   };
-
-  //   const handleCheckboxChange = (event) => {
-  //     const item = event.target.name;
-  //     const isChecked = event.target.checked;
-  //     setCheckedItems((prevState) =>
-  //       isChecked
-  //         ? [...prevState, item]
-  //         : prevState.filter((checkedItem) => checkedItem !== item)
-  //     );
-  //   };
-
-  // const handleCheck = (event) => {
-  //   const item = event.target.name;
-  //   console.log("item==>", item);
-  //   const isChecked = event.target.checked;
-
-  //   // setChecked({ ...checked, item: isChecked });
-  //   var updatedList = [];
-  //   // var updatedList = [...checked];
-  //   let order_item = JSON.parse(event.target.value);
-  //   if (event.target.checked) {
-  //     updatedList = [...checked, order_item];
-  //   } else {
-  //     //   updatedList.slice(checked.indexOf(order_item), 1);
-  //     // setChecked((prevState) =>
-  //     //   !isChecked
-  //     //     ? [...prevState, item]
-  //     //     : prevState.filter((checkedItem) => checkedItem !== item)
-  //     // );
-  //   }
-  //   setChecked(updatedList);
-  // };
   const handleCheckboxChange = (selectedObject) => {
     const selectedOptionIds = selectedOptions.map((option) => option.id);
     if (selectedOptionIds.includes(selectedObject.id)) {
@@ -60,9 +27,6 @@ function OrderForm({ socket }) {
       setSelectedOptions([...selectedOptions, selectedObject]);
     }
   };
-  // Return classes based on whether item is checked
-  // var isChecked = (item) =>
-  //   checked.includes(item) ? "checked-item" : "not-checked-item";
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -74,15 +38,10 @@ function OrderForm({ socket }) {
       status: "Pending",
       timestamp: new Date().toLocaleString(),
     };
-    console.log("order==> ", order);
-
-    // socket.on("connect", () => {
-    //   console.log(socket.id); // x8WIv7-mJelg7on_ALbx
-    // });
 
     if (socket.connected) {
       socket.emit("placeOrder", order, (response) => {
-        console.log(response.status); // ok
+        // console.log(response.status); // ok
       }); // send order to server
     } else {
       console.log("Server is not connected");
@@ -91,7 +50,7 @@ function OrderForm({ socket }) {
     // reset form
     setTableNumber("");
     setOrderBy("");
-    setChecked([]);
+    setSelectedOptions([]);
   };
 
   return (
@@ -101,7 +60,8 @@ function OrderForm({ socket }) {
         <form onSubmit={handleSubmit}>
           <label for="tableNumber">Table Number:</label> <br />
           <input
-            type="text"
+            required
+            type="number"
             id="tableNumber"
             value={tableNumber}
             onChange={handleTableNumberChange}
@@ -111,6 +71,7 @@ function OrderForm({ socket }) {
           <label for="orderby">Ordered By:</label>
           <br />
           <input
+            required
             type="text"
             id="orderby"
             value={orderBy}
@@ -146,7 +107,11 @@ function OrderForm({ socket }) {
               </li>
             ))}
           </ul>
-          <Button type="submit">Place Order</Button>
+          <div className="middleAllignment">
+            <Button type="submit" disabled={selectedOptions.length == 0}>
+              Place Order
+            </Button>
+          </div>
         </form>
       </Card>
     </div>

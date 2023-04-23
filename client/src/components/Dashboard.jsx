@@ -3,17 +3,15 @@ import { Table } from "react-bootstrap";
 
 function Dashboard({ socket }) {
   const [orders, setOrders] = useState([]);
-  console.log("socket==> ", socket);
+  // console.log("socket==> ", socket);
   useEffect(() => {
     // listen for "newOrder" event from server
     socket.on("newOrder", (order) => {
-      console.log("order==> ", order);
       setOrders((orders) => [...orders, order]); // add new order to state
     });
 
     // listen for "orderStatusUpdate" event from server
     socket.on("orderStatusUpdate", (updatedOrder) => {
-      console.log("updatedOrder==> ", updatedOrder);
       setOrders((orders) =>
         orders.map((order) =>
           order.id === updatedOrder.id ? updatedOrder : order
@@ -34,11 +32,9 @@ function Dashboard({ socket }) {
           </tr>
         </thead>
         <tbody>
-          {console.log("orders.items=> ", orders)}
           {orders?.map((item) => (
             <tr key={item.tableNumber}>
               <td>{item.tableNumber}</td>
-              <td>{item.orderBy}</td>
               <td>{item.orderBy}</td>
               {item.items?.map((order) => (
                 <>
