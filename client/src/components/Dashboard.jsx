@@ -40,7 +40,7 @@ function Dashboard({ socket }) {
                 <>
                   <div>ID: {order.id}</div>
                   <div>Name: {order.name}</div>
-                  <div>Price: {order.price}</div>
+                  <div>Price: &#8377; {order.price}/-</div>
                   <br />
                 </>
               ))}
