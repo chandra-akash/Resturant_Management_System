@@ -6,13 +6,47 @@
 }
 .card {
   width: fit-content;
-  padding: 100px;
+  padding: 50px;
   margin-top: 20px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
     rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
     rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 }
-.middleAllignment{
+.middleAllignment {
   display: flex;
   justify-content: center;
+}
+.heading {
+  background: #34e89e;
+  background: -webkit-linear-gradient(to right, #0f3443, #34e89e);
+  background: linear-gradient(to right, #0f3443, #34e89e);
+  padding: 10px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  color: white;
+  animation: gradient 15s ease infinite;
+  background-size: 400% 400%;
+}
+.heading > h2 {
+  text-align: center;
+  margin: auto;
+}
+.formsection {
+  margin: auto;
+}
+.itemcheckbox {
+  display: flex;
+  gap: 5px;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }

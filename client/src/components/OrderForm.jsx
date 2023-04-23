@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Button } from "react-bootstrap";
+import { Card, Button, Form } from "react-bootstrap";
 import "./orderform.css";
 function OrderForm({ socket }) {
   const [tableNumber, setTableNumber] = useState("");
@@ -56,63 +56,95 @@ function OrderForm({ socket }) {
   return (
     <div className="main">
       <Card className="card">
-        <h1>Place Order</h1>
-        <form onSubmit={handleSubmit}>
-          <label for="tableNumber">Table Number:</label> <br />
-          <input
-            required
-            type="number"
-            id="tableNumber"
-            value={tableNumber}
-            onChange={handleTableNumberChange}
-          />
-          <br />
-          <br />
-          <label for="orderby">Ordered By:</label>
-          <br />
-          <input
-            required
-            type="text"
-            id="orderby"
-            value={orderBy}
-            onChange={handleOrderByChange}
-          />
-          <br />
-          <br />
-          <h4>Select Items:</h4>
-          <div style={{}}>
-            {menuItems.map((item, index) => (
-              <div key={index}>
-                <input
-                  name={index}
-                  value={JSON.stringify(item)}
-                  type="checkbox"
-                  // onChange={(e) => handleCheck(e, item)}
-                  checked={selectedOptions.some(
-                    (selectedOption) => selectedOption.id === item.id
-                  )}
-                  onChange={() => handleCheckboxChange(item)}
-                />
-                <span>
-                  {item.name} &#8377;{item.price}/-
-                </span>
-              </div>
-            ))}
-          </div>
-          <br />
-          <ul>
-            {selectedOptions.map((item) => (
-              <li key={item.id}>
-                {item.name} (&#8377;{item.price})
-              </li>
-            ))}
-          </ul>
-          <div className="middleAllignment">
-            <Button type="submit" disabled={selectedOptions.length == 0}>
-              Place Order
-            </Button>
-          </div>
-        </form>
+        <div className="heading">
+          <h2>Welcome to XYZ Resturent</h2>
+        </div>
+        <div className="formsection">
+          <h1>Place Order</h1>
+          <form onSubmit={handleSubmit}>
+            <Form.Label>Table Number</Form.Label>
+            <Form.Control
+              required
+              min={1}
+              type="number"
+              id="tableNumber"
+              value={tableNumber}
+              onChange={handleTableNumberChange}
+            />
+            {/* <label for="tableNumber">Table Number:</label> <br /> */}
+            {/* <input
+              required
+              type="number"
+              id="tableNumber"
+              value={tableNumber}
+              onChange={handleTableNumberChange}
+            /> */}
+            <Form.Label>Ordered By</Form.Label>
+            <Form.Control
+              required
+              type="text"
+              id="orderby"
+              value={orderBy}
+              onChange={handleOrderByChange}
+            />
+            {/* <label for="orderby">Ordered By:</label>
+            <br />
+            <input
+              required
+              type="text"
+              id="orderby"
+              value={orderBy}
+              onChange={handleOrderByChange}
+            /> */}
+
+            <br />
+            <h4>Select Items:</h4>
+            <div style={{}}>
+              {menuItems.map((item, index) => (
+                <div key={index}>
+                  {/* <input
+                    name={index}
+                    value={JSON.stringify(item)}
+                    type="checkbox"
+                    // onChange={(e) => handleCheck(e, item)}
+                    checked={selectedOptions.some(
+                      (selectedOption) => selectedOption.id === item.id
+                    )}
+                    onChange={() => handleCheckboxChange(item)}
+                  /> */}
+                  <div className="itemcheckbox">
+                    <Form.Check
+                      name={index}
+                      value={JSON.stringify(item)}
+                      type="checkbox"
+                      // onChange={(e) => handleCheck(e, item)}
+                      checked={selectedOptions.some(
+                        (selectedOption) => selectedOption.id === item.id
+                      )}
+                      onChange={() => handleCheckboxChange(item)}
+                    />
+                    <span>
+                      {item.name} &#8377;{item.price}/-
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <br />
+            <ul>
+              {selectedOptions.map((item) => (
+                <li key={item.id}>
+                  {item.name} (&#8377;{item.price})
+                </li>
+              ))}
+            </ul>
+            <div className="middleAllignment">
+              <Button type="submit" disabled={selectedOptions.length == 0}>
+                Place Order
+              </Button>
+            </div>
+          </form>
+        </div>
       </Card>
     </div>
   );
