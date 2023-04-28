@@ -1,16 +1,17 @@
 import React, { useState } from "react";
-import { Card, Button, Form } from "react-bootstrap";
+import { Card, Button, Form, Table } from "react-bootstrap";
 import "./orderform.css";
 function OrderForm({ socket }) {
   const [tableNumber, setTableNumber] = useState("");
   const [orderBy, setOrderBy] = useState("");
-  const [menuItems] = useState([
-    { id: 1, name: "Burger", price: 10, qty: 1 },
-    { id: 2, name: "Pizza", price: 15, qty: 1 },
-    { id: 3, name: "Salad", price: 8, qty: 1 },
+  const [menuItems, setMenuItems] = useState([
+    { id: 1, name: "Burger", price: 10, qty: 1, totalPrice: 10 },
+    { id: 2, name: "Pizza", price: 15, qty: 1, totalPrice: 15 },
+    { id: 3, name: "Salad", price: 8, qty: 1, totalPrice: 8 },
   ]);
   const [selectedOptions, setSelectedOptions] = useState([]);
-  const [ordQty, setOrdQty] = useState(1);
+  const [ordQty, setOrdQty] = useState(0);
+  const [ordPrice, setOrdPrice] = useState(0);
 
   const handleTableNumberChange = (event) => {
     setTableNumber(event.target.value);
@@ -20,6 +21,11 @@ function OrderForm({ socket }) {
   };
   const handleCheckboxChange = (selectedObject) => {
     const selectedOptionIds = selectedOptions.map((option) => option.id);
+    console.log("selectedOptions--> ", selectedOptions);
+    console.log("selectedOptionIds--> ", selectedOptionIds);
+    console.log("selectedObject--> ", selectedObject);
+    setOrdQty(ordQty + selectedObject.qty);
+    setOrdPrice(ordPrice + selectedObject.totalPrice);
     if (selectedOptionIds.includes(selectedObject.id)) {
       setSelectedOptions(
         selectedOptions.filter((option) => option.id !== selectedObject.id)
@@ -31,21 +37,29 @@ function OrderForm({ socket }) {
 
   const handleIncrement = (e, item) => {
     console.log("line:33--> ", e, item);
-    setOrdQty(ordQty + 1);
+    // setOrdQty(ordQty + 1);
     item.qty++;
+    item.totalPrice = item.price * item.qty;
+    setMenuItems([...menuItems]);
   };
 
   const handleDecrement = (e, item) => {
-    setOrdQty(ordQty - 1);
+    // setOrdQty(ordQty - 1);
+    item.qty--;
+    item.totalPrice = item.price * item.qty;
+    setMenuItems([...menuItems]);
   };
 
   const handleChange = (event, item) => {
-    setOrdQty(parseInt(event.target.value));
+    // setOrdQty(parseInt(event.target.value));
+    item.qty = parseInt(event.target.value);
+    item.totalPrice = item.price * item.qty;
+    setMenuItems([...menuItems]);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
+    console.log("selectedOptions===> ", selectedOptions);
     const order = {
       tableNumber: tableNumber,
       orderBy: orderBy,
@@ -66,7 +80,12 @@ function OrderForm({ socket }) {
     setTableNumber("");
     setOrderBy("");
     setSelectedOptions([]);
-    setOrdQty(1);
+    // setOrdQty(1);
+    setMenuItems([
+      { id: 1, name: "Burger", price: 10, qty: 1, totalPrice: 10 },
+      { id: 2, name: "Pizza", price: 15, qty: 1, totalPrice: 15 },
+      { id: 3, name: "Salad", price: 8, qty: 1, totalPrice: 8 },
+    ]);
   };
 
   return (
@@ -98,7 +117,83 @@ function OrderForm({ socket }) {
             />
             <br />
             <h4>Select Items:</h4>
-            <div style={{}}>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Items</th>
+                  <th>Quantity</th>
+                  <th>Price (Rs.)</th>
+                  <th>Total Price (Rs.)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {menuItems.map((item, index) => (
+                  <tr key={index}>
+                    {/* <div className="itemcheckbox"> */}
+                    <td>
+                      <Form.Check
+                        name={index}
+                        value={JSON.stringify(item)}
+                        type="checkbox"
+                        // onChange={(e) => handleCheck(e, item)}
+                        checked={selectedOptions.some(
+                          (selectedOption) => selectedOption.id === item.id
+                        )}
+                        onChange={() => handleCheckboxChange(item)}
+                      />
+                    </td>
+                    {/* <span> */}
+                    <td>{item.name}</td>
+                    <td>
+                      <Form.Group
+                        controlId="countOrderInput"
+                        className="orderQtyCount"
+                      >
+                        <Button
+                          variant="primary"
+                          onClick={(e) => handleIncrement(e, item)}
+                          disabled={item.qty > 9999}
+                          className="incrbtn"
+                        >
+                          +
+                        </Button>
+                        <Form.Control
+                          type="number"
+                          id={item.id}
+                          value={item.qty}
+                          onChange={(e) => handleChange(e, item)}
+                          style={{ width: "50px" }}
+                          disabled={item.qty <= 0}
+                          className="inpbtn"
+                        />
+                        <Button
+                          variant="primary"
+                          onClick={(e) => handleDecrement(e, item)}
+                          disabled={item.qty <= 1}
+                          className="decrbtn"
+                        >
+                          -
+                        </Button>
+                      </Form.Group>
+                    </td>
+                    <td style={{ textAlign: "right" }}>{item.price} /- </td>
+                    <td style={{ textAlign: "right" }}>
+                      {Number(item.qty * item.price)} /-
+                    </td>
+                    {/* </span> */}
+                    {/* </div> */}
+                  </tr>
+                ))}
+                <tr>
+                  <th colSpan={2}>Total Item(s): </th>
+                  <td>{ordQty}</td>
+                  <th>Total Bill: </th>
+                  <td style={{ textAlign: "right" }}>&#x20B9; {ordPrice} /-</td>
+                </tr>
+              </tbody>
+            </Table>
+            {/* <div style={{}}>
               {menuItems.map((item, index) => (
                 <div key={index}>
                   <div className="itemcheckbox">
@@ -142,7 +237,7 @@ function OrderForm({ socket }) {
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
             <br />
             <ul>
               {selectedOptions.map((item) => (

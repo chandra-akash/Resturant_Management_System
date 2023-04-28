@@ -6,8 +6,9 @@
 }
 .card {
   width: fit-content;
+  height: 95vh;
   padding: 50px;
-  margin-top: 20px;
+  margin-top: 10px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
     rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
     rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
@@ -39,7 +40,15 @@
   gap: 5px;
   align-items: baseline;
 }
-
+.incrbtn{
+  border-radius: 5px 0 0 5px;
+}
+.inpbtn{
+  border-radius: 0;
+}
+.decrbtn{
+  border-radius: 0 5px 5px 0;
+}
 .plus-minus-case .btn, .plus-minus-box .btn {
   height: 30px;
   margin-bottom: 1px !important;
