@@ -5,9 +5,9 @@ function OrderForm({ socket }) {
   const [tableNumber, setTableNumber] = useState("");
   const [orderBy, setOrderBy] = useState("");
   const [menuItems] = useState([
-    { id: 1, name: "Burger", price: 10, qty1: 1 },
-    { id: 2, name: "Pizza", price: 15, qty2: 1 },
-    { id: 3, name: "Salad", price: 8, qty3: 1 },
+    { id: 1, name: "Burger", price: 10, qty: 1 },
+    { id: 2, name: "Pizza", price: 15, qty: 1 },
+    { id: 3, name: "Salad", price: 8, qty: 1 },
   ]);
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [ordQty, setOrdQty] = useState(1);
@@ -32,13 +32,7 @@ function OrderForm({ socket }) {
   const handleIncrement = (e, item) => {
     console.log("line:33--> ", e, item);
     setOrdQty(ordQty + 1);
-    item.id == 1
-      ? item.qty1++
-      : item.id == 2
-      ? item.qty2++
-      : item.id == 3
-      ? item.qty3++
-      : null;
+    item.qty++;
   };
 
   const handleDecrement = (e, item) => {
@@ -133,7 +127,7 @@ function OrderForm({ socket }) {
                         <Form.Control
                           type="number"
                           id={item.id}
-                          value={ordQty}
+                          value={item.qty}
                           onChange={(e) => handleChange(e, item)}
                           style={{ width: "50px" }}
                         />
