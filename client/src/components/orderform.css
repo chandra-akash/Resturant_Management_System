@@ -37,8 +37,20 @@
 .itemcheckbox {
   display: flex;
   gap: 5px;
+  align-items: baseline;
 }
 
+.plus-minus-case .btn, .plus-minus-box .btn {
+  height: 30px;
+  margin-bottom: 1px !important;
+  line-height: 1;
+}
+.plus-minus-case, .plus-minus-box {
+  float: right;
+}
+.orderQtyCount{
+  display: inline-flex;
+}
 @keyframes gradient {
   0% {
     background-position: 0% 50%;
