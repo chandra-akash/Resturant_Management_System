@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Card, Button, Form, Table } from "react-bootstrap";
+import Swal from "sweetalert2";
 import "./orderform.css";
 function OrderForm({ socket }) {
   const [tableNumber, setTableNumber] = useState("");
@@ -21,37 +22,32 @@ function OrderForm({ socket }) {
   };
   const handleCheckboxChange = (selectedObject) => {
     const selectedOptionIds = selectedOptions.map((option) => option.id);
-    console.log("selectedOptions--> ", selectedOptions);
-    console.log("selectedOptionIds--> ", selectedOptionIds);
-    console.log("selectedObject--> ", selectedObject);
-    setOrdQty(ordQty + selectedObject.qty);
-    setOrdPrice(ordPrice + selectedObject.totalPrice);
     if (selectedOptionIds.includes(selectedObject.id)) {
       setSelectedOptions(
         selectedOptions.filter((option) => option.id !== selectedObject.id)
       );
+      setOrdQty(ordQty - selectedObject.qty);
+      setOrdPrice(ordPrice - selectedObject.totalPrice);
     } else {
       setSelectedOptions([...selectedOptions, selectedObject]);
+      setOrdQty(ordQty + selectedObject.qty);
+      setOrdPrice(ordPrice + selectedObject.totalPrice);
     }
   };
 
   const handleIncrement = (e, item) => {
-    console.log("line:33--> ", e, item);
-    // setOrdQty(ordQty + 1);
     item.qty++;
     item.totalPrice = item.price * item.qty;
     setMenuItems([...menuItems]);
   };
 
   const handleDecrement = (e, item) => {
-    // setOrdQty(ordQty - 1);
     item.qty--;
     item.totalPrice = item.price * item.qty;
     setMenuItems([...menuItems]);
   };
 
   const handleChange = (event, item) => {
-    // setOrdQty(parseInt(event.target.value));
     item.qty = parseInt(event.target.value);
     item.totalPrice = item.price * item.qty;
     setMenuItems([...menuItems]);
@@ -59,11 +55,13 @@ function OrderForm({ socket }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("selectedOptions===> ", selectedOptions);
+    // arr.find(o => o.name === 'string 1')
     const order = {
       tableNumber: tableNumber,
       orderBy: orderBy,
       items: selectedOptions,
+      totalItems: ordQty,
+      bill: ordPrice,
       status: "Pending",
       timestamp: new Date().toLocaleString(),
     };
@@ -71,21 +69,39 @@ function OrderForm({ socket }) {
     if (socket.connected) {
       socket.emit("placeOrder", order, (response) => {
         // console.log(response.status); // ok
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Your Order has been placed",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       }); // send order to server
+
+      socket.on("error", (err) => {
+        console.log("error=> ", order);
+        Swal.fire({
+          icon: "error",
+          title: "Order not placed",
+          text: err,
+        });
+      });
     } else {
       console.log("Server is not connected");
+      Swal.fire("Server is not connected!", "Order not placed", "question");
     }
 
     // reset form
     setTableNumber("");
     setOrderBy("");
     setSelectedOptions([]);
-    // setOrdQty(1);
     setMenuItems([
       { id: 1, name: "Burger", price: 10, qty: 1, totalPrice: 10 },
       { id: 2, name: "Pizza", price: 15, qty: 1, totalPrice: 15 },
       { id: 3, name: "Salad", price: 8, qty: 1, totalPrice: 8 },
     ]);
+    setOrdQty(0);
+    setOrdPrice(0);
   };
 
   return (
@@ -95,7 +111,7 @@ function OrderForm({ socket }) {
           <h2>Welcome to XYZ Restaurant</h2>
         </div>
         <div className="formsection">
-          <h1>Place Order</h1>
+          <h3>Place Order</h3>
 
           <form onSubmit={handleSubmit}>
             <Form.Label>Table Number</Form.Label>
@@ -115,8 +131,7 @@ function OrderForm({ socket }) {
               value={orderBy}
               onChange={handleOrderByChange}
             />
-            <br />
-            <h4>Select Items:</h4>
+            <h5 className="mt-3">Select Items:</h5>
             <Table striped bordered hover>
               <thead>
                 <tr>
@@ -130,20 +145,17 @@ function OrderForm({ socket }) {
               <tbody>
                 {menuItems.map((item, index) => (
                   <tr key={index}>
-                    {/* <div className="itemcheckbox"> */}
                     <td>
                       <Form.Check
                         name={index}
                         value={JSON.stringify(item)}
                         type="checkbox"
-                        // onChange={(e) => handleCheck(e, item)}
                         checked={selectedOptions.some(
                           (selectedOption) => selectedOption.id === item.id
                         )}
                         onChange={() => handleCheckboxChange(item)}
                       />
                     </td>
-                    {/* <span> */}
                     <td>{item.name}</td>
                     <td>
                       <Form.Group
@@ -181,8 +193,6 @@ function OrderForm({ socket }) {
                     <td style={{ textAlign: "right" }}>
                       {Number(item.qty * item.price)} /-
                     </td>
-                    {/* </span> */}
-                    {/* </div> */}
                   </tr>
                 ))}
                 <tr>
@@ -193,59 +203,6 @@ function OrderForm({ socket }) {
                 </tr>
               </tbody>
             </Table>
-            {/* <div style={{}}>
-              {menuItems.map((item, index) => (
-                <div key={index}>
-                  <div className="itemcheckbox">
-                    <Form.Check
-                      name={index}
-                      value={JSON.stringify(item)}
-                      type="checkbox"
-                      // onChange={(e) => handleCheck(e, item)}
-                      checked={selectedOptions.some(
-                        (selectedOption) => selectedOption.id === item.id
-                      )}
-                      onChange={() => handleCheckboxChange(item)}
-                    />
-                    <span>
-                      {item.name} &#8377;{item.price}/- x
-                      <Form.Group
-                        controlId="countOrderInput"
-                        className="orderQtyCount ms-3 mt-3"
-                      >
-                        <Button
-                          variant="primary"
-                          onClick={(e) => handleIncrement(e, item)}
-                        >
-                          +
-                        </Button>
-                        <Form.Control
-                          type="number"
-                          id={item.id}
-                          value={item.qty}
-                          onChange={(e) => handleChange(e, item)}
-                          style={{ width: "50px" }}
-                        />
-                        <Button
-                          variant="primary"
-                          onClick={(e) => handleDecrement(e, item)}
-                        >
-                          -
-                        </Button>
-                      </Form.Group>
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div> */}
-            <br />
-            <ul>
-              {selectedOptions.map((item) => (
-                <li key={item.id}>
-                  {item.name} (&#8377;{item.price})
-                </li>
-              ))}
-            </ul>
             <div className="middleAllignment">
               <Button type="submit" disabled={selectedOptions.length == 0}>
                 Place Order

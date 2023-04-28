@@ -21,7 +21,15 @@ function Dashboard({ socket }) {
     });
   }, []);
 
-  const columns = ["Table Number", "Order By", "Items", "Order Time", "Status"];
+  const columns = [
+    "Table Number",
+    "Order By",
+    "Items",
+    "Total Items",
+    "Bill (Rs.)",
+    "Order Time",
+    "Status",
+  ];
   return (
     <>
       <Table striped bordered hover>
@@ -37,14 +45,21 @@ function Dashboard({ socket }) {
             <tr key={item.tableNumber}>
               <td>{item.tableNumber}</td>
               <td>{item.orderBy}</td>
-              {item.items?.map((order) => (
-                <>
-                  <div>ID: {order.id}</div>
-                  <div>Name: {order.name}</div>
-                  <div>Price: &#8377; {order.price}/-</div>
-                  <br />
-                </>
-              ))}
+              <td>
+                {item.items?.map((order) => (
+                  <>
+                    <div>Item: <b>{order.name}</b></div>
+                    <div>Quantity: <b>{order.qty}</b></div>
+                    <div>
+                      Price: {order.qty} x &#8377; {order.price}/- ={" "}
+                      <b>{order.totalPrice}</b>
+                    </div>
+                    <br />
+                  </>
+                ))}
+              </td>
+              <td>{item.totalItems}</td>
+              <td>&#x20B9; {item.bill}/-</td>
               <td>{item.timestamp}</td>
               <td>{item.status}</td>
             </tr>
